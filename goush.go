@@ -1,18 +1,14 @@
 package main
 
 import "github.com/go-martini/martini"
-import "github.com/garyburd/redigo/redis"
 
 func main() {
-	c, err := redis.Dial("tcp", ":6379")
-	if err != nil {
-		panic(err)
-	}
-	defer c.Close()
+	Open()
+	defer Close()
 
 	m := martini.Classic()
 	m.Get("/", func() string {
-		url, _ := redis.String(c.Do("GET", "u:1"))
+		url := GetUrl(3)
 		return "Hello rafał! " + url
 	})
 	m.Run()
