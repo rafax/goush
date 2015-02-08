@@ -2,19 +2,21 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/go-martini/martini"
+	"github.com/gin-gonic/gin"
 	"net/http"
+	"runtime"
 	"time"
 )
 
 func main() {
 	InitDb()
 
-	m := martini.Classic()
-	m.Get("/benchmark/:uid", func(params martini.Params, req *http.Request) string {
-		return VisitUrl(params["uid"], VisitData(req))
+	g := gin.Default()
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	g.GET("/benchmark/:uid", func(c *gin.Context) {
+		c.String(200, VisitUrl(c.Params.ByName("uid"), VisitData(c.Request)))
 	})
-	m.Run()
+	g.Run(":3000")
 }
 
 func VisitData(req *http.Request) []byte {
